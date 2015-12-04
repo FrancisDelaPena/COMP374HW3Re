@@ -15,25 +15,21 @@ namespace Homework3 {
             var progressMonitor = new ProgressMonitor(results);
 
             new Thread(progressMonitor.Run) {IsBackground = true}.Start();
-            
-            foreach (var value in reader.ReadIntegers()) {
-                numbersToCheck.Enqueue(value);
-            }
-            
-            while (true)
-            {
-                bool continue = true;
+            reader.ReadIntegers(numbersToCheck);
+
+            while (true) {
+                bool continuing = true;
                 lock (IsNumberPrimeCalculator.LockQueue)
                 {
-                    continue = numbersToCheck.Count > 0;
+                    continuing = numbersToCheck.Count > 0;
                 }
-                if (continue == false)
-                {
-                    break;
-                }
-                Thread.Sleep(100); // wait for the computation to complete.
-            }
+                    if (continuing == false) {
+                        break;
+                    }
 
+                Thread.Sleep(100); // wait for the computation to complete.
+
+            }
             Console.WriteLine("{0} of the numbers were prime", progressMonitor.TotalCount);
         }
 
@@ -41,10 +37,9 @@ namespace Homework3 {
             var threads = CreateThreads(results, numbersToCheck);
             threads.ForEach(thread => thread.Start());
         }
-        
+
         private static List<Thread> CreateThreads(List<long> results, Queue<long> numbersToCheck) {
             var threadCount = Environment.ProcessorCount*2;
-
             Console.WriteLine("Using {0} compute threads and 1 I/O thread", threadCount);
 
             var threads =
@@ -59,4 +54,3 @@ namespace Homework3 {
             return threads;
         }
     }
-}
